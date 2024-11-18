@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, FlatList } from 'react-native';
 
 type Card = {
   id: number;
@@ -15,33 +15,47 @@ type CardContainerProps = {
 };
 
 const CardContainer: React.FC<CardContainerProps> = ({ cards, flippedIndices, handleCardPress }) => {
+  const renderItem = ({ item, index }: { item: Card; index: number }) => {
+    return (
+      <TouchableOpacity
+        key={index}
+        style={[
+          styles.card,
+          item.isFlipped && styles.flippedCard,
+          item.isFlipped && flippedIndices.includes(index) && styles.flippedCard,
+          item.isMatched && styles.matchedCard,
+        ]}
+        onPress={() => handleCardPress(index)}
+        disabled={flippedIndices.length === 2}
+      >
+        {item.isFlipped && <Text style={styles.cardText}>{item.value}</Text>}
+      </TouchableOpacity>
+    );
+  };
+
   return (
     <View style={styles.cardContainer}>
-      {cards.map((card, index) => (
-        <TouchableOpacity
-          key={index}
-          style={[
-            styles.card,
-            card.isFlipped && styles.flippedCard,
-            card.isFlipped && flippedIndices.includes(index) && styles.flippedCard,
-            card.isMatched && styles.matchedCard,
-          ]}
-          onPress={() => handleCardPress(index)}
-          disabled={flippedIndices.length === 2}
-        >
-          {card.isFlipped && <Text style={styles.cardText}>{card.value}</Text>}
-        </TouchableOpacity>
-      ))}
+      <FlatList
+        data={cards}
+        renderItem={renderItem}
+        keyExtractor={(item) => item.id.toString()}
+        numColumns={3} 
+        contentContainerStyle={styles.flatListContent} 
+      />
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   cardContainer: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center',
+    flex: 2,
   },
+  
+  flatListContent: {
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+
   card: {
     width: 100,
     height: 150,
@@ -51,12 +65,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#007bff',
   },
+
   flippedCard: {
     backgroundColor: '#64B5F6',
   },
+
   matchedCard: {
     backgroundColor: '#444444',
   },
+
   cardText: {
     fontSize: 20,
     fontWeight: 'bold',

@@ -126,9 +126,12 @@ export default function App() {
 
     
     setTimeout(() => {
-      setCards((prevCards) =>
-        prevCards.map((card) => ({ ...card, isFlipped: true }))
-      );
+      if (isEasyEnabled) {
+        setCards((prevCards) =>
+          prevCards.map((card) => ({ ...card, isFlipped: true }))
+        );
+      }
+      
       setTimeout(() => {
         setCards((prevCards) =>
           prevCards.map((card) => ({ ...card, isFlipped: false }))
@@ -141,7 +144,6 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.safeContainer}>
-      <ScrollView contentContainerStyle={styles.container}>
         <GameModal
           isVisible={isModalVisible}
           isGameEnd={isGameEnd}
@@ -162,13 +164,13 @@ export default function App() {
               buttonTitle={buttonTitle}
               onButtonPress={() => setIsModalVisible(true)}
             />
-            <CardContainer
+           
+          </View>
+          <CardContainer
               cards={cards}
               flippedIndices={flippedIndices}
               handleCardPress={handleCardPress}
             />
-          </View>
-      </ScrollView>
     </SafeAreaView>
   );
 }
